@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.util.CalculateRate;
+import com.example.util.GetImage;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.util.Log;
 import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 public class MainActivity extends Activity {
@@ -21,6 +24,7 @@ public class MainActivity extends Activity {
 	ListView listView;
 	List<RecordEntity> recordList = new ArrayList<RecordEntity>();
 	ArrayList<String> recordString;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,15 +33,12 @@ public class MainActivity extends Activity {
 		listView=(ListView) findViewById(R.id.rateRecord);
 		
 		GetCallRecords getCallRecords=new GetCallRecords();
-		getCallRecords.execute();
-		
-		
-		
-		
+		getCallRecords.execute();		
 	}
 	
 	private class GetCallRecords extends AsyncTask<String, Integer, String>{
 
+		Bitmap bitmap;
 		@Override
 		protected String doInBackground(String... params) {
 			ContentResolver contentResolver = MainActivity.this.getContentResolver();   
@@ -95,12 +96,16 @@ public class MainActivity extends Activity {
 				}
 				recordString.add(recordList.get(i).toString());			
 			}
+			
+			bitmap=GetImage.get_image(MainActivity.this, recordList.get(1).number);
 			return null;
 		}
 		
 		@Override
 		protected void onPostExecute(String result) {
-			
+			ImageView imageView=new ImageView(MainActivity.this);
+			imageView.setImageBitmap(bitmap);
+			setContentView(imageView);
 			listView.setAdapter(new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,recordString));
 		}
 	}	
